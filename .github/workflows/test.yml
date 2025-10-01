@@ -16,7 +16,14 @@ jobs:
       - name: Free additional disk space
         run: |
           df -h
-          rm -rf /opt/hostedtoolcache/
+          echo "Removing android..."
+          rm -rf /usr/local/lib/android
+          echo "Removing dotnet..."
+          rm -rf /usr/share/dotnet
+          echo "Removing haskell"
+          rm -rf /opt/ghc
+          echo "Removing tool cache..."
+          rm -rf /opt/hostedtoolcache
           df -h
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,7 +55,14 @@ jobs:
       - name: Free additional disk space
         run: |
           df -h
-          rm -rf /opt/hostedtoolcache/
+          echo "Removing android..."
+          rm -rf /usr/local/lib/android
+          echo "Removing dotnet..."
+          rm -rf /usr/share/dotnet
+          echo "Removing haskell"
+          rm -rf /opt/ghc
+          echo "Removing tool cache..."
+          rm -rf /opt/hostedtoolcache
           df -h
       - name: Checkout
         uses: actions/checkout@v4
