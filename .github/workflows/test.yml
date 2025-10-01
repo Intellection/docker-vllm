@@ -31,10 +31,10 @@ jobs:
           CIBW_BEFORE_ALL: "dnf install clang lld -y"
           CIBW_BUILD: "cp312-manylinux_aarch64"
           CIBW_ENVIRONMENT: "MAX_JOBS=4 TRITON_BUILD_WITH_CLANG_LLD=1"
-          run: |
-            python --version
-            python3 -m pip install cibuildwheel --user
-            python3 -m cibuildwheel python --output-dir wheelhouse
+        run: |
+          python --version
+          python3 -m pip install cibuildwheel --user
+          python3 -m cibuildwheel python --output-dir wheelhouse
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
