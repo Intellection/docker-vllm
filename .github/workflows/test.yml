@@ -9,10 +9,10 @@ env:
   IMAGE: zappi/vllm-openai
 
 jobs:
-  build-amd64:
+  prepare:
     runs-on: ubuntu-latest
     steps:
-      - name: Prepare additional disk space
+      - name: Free additional disk space
         run: |
           df -h
           echo "Removing large packages"
@@ -33,6 +33,11 @@ jobs:
           rm -rf /usr/share/dotnet/
           rm -rf /opt/hostedtoolcache/
           df -h
+
+  build-amd64:
+    runs-on: ubuntu-latest
+    needs: prepare
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Prepare image metadata
@@ -55,30 +60,11 @@ jobs:
           platforms: linux/amd64
           push: false
           tags: ${{ steps.metadata.outputs.tags }}
+
   build-arm64:
     runs-on: ubuntu-latest
+    needs: prepare
     steps:
-      - name: Prepare additional disk space
-        run: |
-          df -h
-          echo "Removing large packages"
-          sudo apt-get remove -y '^dotnet-.*'
-          sudo apt-get remove -y '^llvm-.*'
-          sudo apt-get remove -y 'php.*'
-          sudo apt-get remove -y azure-cli
-          sudo apt-get remove -y firefox
-          sudo apt-get remove -y powershell
-          sudo apt-get remove -y google-chrome-stable
-          sudo apt-get remove -y google-cloud-cli
-          sudo apt-get remove -y mono-devel
-          sudo apt-get autoremove -y
-          sudo apt-get clean
-          df -h
-          echo "Removing large directories"
-          # deleting 15GB
-          rm -rf /usr/share/dotnet/
-          rm -rf /opt/hostedtoolcache/
-          df -h
       - name: Checkout
         uses: actions/checkout@v4
       - name: Prepare image metadata
