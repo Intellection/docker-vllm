@@ -40,8 +40,6 @@ jobs:
       - name: Test building of image
         uses: docker/build-push-action@v6
         with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           context: .
           file: Dockerfile.amd64
           labels: ${{ steps.metadata.outputs.labels }}
@@ -80,8 +78,6 @@ jobs:
       - name: Test building of image
         uses: docker/build-push-action@v6
         with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           context: .
           file: Dockerfile.arm64
           labels: ${{ steps.metadata.outputs.labels }}
