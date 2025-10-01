@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-24.04-arm
     concurrency: arm64
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: triton-lang/triton
+          ref: v3.2.0
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.2.0
         env:
