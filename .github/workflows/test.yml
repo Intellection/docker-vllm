@@ -18,6 +18,11 @@ jobs:
         with:
           repository: triton-lang/triton
           ref: v3.2.0
+      - name: Patch setup.py
+        run: |
+          echo "" >> python/setup.cfg
+          echo "[build_ext]" >> python/setup.cfg
+          echo "base-dir=/project" >> python/setup.cfg
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.2.0
         env:
