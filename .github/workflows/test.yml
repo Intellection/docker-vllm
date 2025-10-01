@@ -9,6 +9,25 @@ env:
   IMAGE: zappi/vllm-openai
 
 jobs:
+  build-triton-wheel-arm64:
+    runs-on: ubuntu-24.04-arm
+    concurrency: arm64
+    steps:
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.2.0
+        env:
+          CIBW_BEFORE_ALL: "dnf install clang lld -y"
+          CIBW_BUILD: "cp312-manylinux_aarch64"
+          CIBW_ENVIRONMENT: "MAX_JOBS=4 TRITON_BUILD_WITH_CLANG_LLD=1"
+        with:
+          package-dir: python
+          output-dir: wheelhouse
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: triton-wheels-linux-arm64
+          path: ./wheelhouse/*.whl
+
   build-amd64:
     runs-on: ubuntu-latest
     concurrency: amd64
@@ -49,6 +68,7 @@ jobs:
 
   build-arm64:
     runs-on: ubuntu-latest
+    needs: build-triton-wheel-arm64
     concurrency: arm64
     steps:
       - name: Free additional disk space
@@ -66,6 +86,11 @@ jobs:
           df -h
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Download a single artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: triton-wheels-linux-arm64
+          path: ./wheelhouse/
       - name: Prepare image metadata
         id: metadata
         uses: docker/metadata-action@v5
