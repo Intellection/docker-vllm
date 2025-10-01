@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: triton-lang/triton
-          ref: v3.2.0
+          ref: v3.4.0
       - name: Patch setup.py
         run: |
           echo "" >> python/setup.cfg
@@ -26,8 +26,9 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.2.0
         env:
+          CIBW_BEFORE_ALL: "dnf install clang lld -y"
           CIBW_BUILD: "cp312-manylinux_aarch64"
-          CIBW_ENVIRONMENT: "MAX_JOBS=4"
+          CIBW_ENVIRONMENT: "MAX_JOBS=4 TRITON_BUILD_WITH_CLANG_LLD=1"
         with:
           package-dir: python
           output-dir: wheelhouse
