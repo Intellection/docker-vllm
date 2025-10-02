@@ -28,9 +28,8 @@ jobs:
           python-version: "3.11"
       - name: Patch setup
         run: |
-          cp main/triton/patches/python/ triton/python/setup.cfg
-          cp main/triton/patches/setup.py triton/python/setup.py
-          cp main/triton/patches/llvm-hash.txt triton/cmake/llvm-hash.txt
+          cp -r main/triton/patches/python/* triton/python/
+          cp -r main/triton/patches/cmake/* triton/cmake/
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.2.0
         env:
