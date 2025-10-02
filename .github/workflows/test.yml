@@ -15,17 +15,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           repository: triton-lang/triton
-          ref: v3.4.0
+          ref: v3.2.0
+          path: triton
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Patch setup.py
+      - name: Patch setup
         run: |
-          echo "" >> python/setup.cfg
-          echo "[build_ext]" >> python/setup.cfg
-          echo "base-dir=/project" >> python/setup.cfg
+          cp triton/patches/setup.cfg triton/python/setup.cfg
+          cp triton/patches/setup.py triton/python/setup.py
       - name: Build wheels
         env:
           CIBW_BEFORE_ALL: "dnf install clang lld -y"
@@ -34,7 +36,7 @@ jobs:
         run: |
           python --version
           python3 -m pip install cibuildwheel --user
-          python3 -m cibuildwheel . --output-dir wheelhouse
+          python3 -m cibuildwheel triton/python --output-dir wheelhouse
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
