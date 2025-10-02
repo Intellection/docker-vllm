@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          path: vllm
+          path: main
       - name: Checkout
         uses: actions/checkout@v5
         with:
@@ -28,8 +28,8 @@ jobs:
           python-version: "3.11"
       - name: Patch setup
         run: |
-          cp ./vllm/triton/patches/setup.cfg ./triton/python/setup.cfg
-          cp ./vllm/triton/patches/setup.py ./triton/python/setup.py
+          cp main/triton/patches/setup.cfg triton/python/setup.cfg
+          cp main/triton/patches/setup.py triton/python/setup.py
       - name: Build wheels
         env:
           CIBW_BEFORE_ALL: "dnf install clang lld -y"
