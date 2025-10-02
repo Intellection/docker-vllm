@@ -23,9 +23,6 @@ jobs:
           repository: triton-lang/triton
           ref: v3.3.1
           path: triton
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
       - name: Patch setup
         run: |
           cp -r main/triton/patches/python/* triton/python/
