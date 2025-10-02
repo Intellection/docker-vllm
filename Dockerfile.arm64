@@ -1,7 +1,7 @@
 FROM vllm/vllm-openai:v0.10.2
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system triton==3.3.0
+    uv pip install --system triton==3.3.1
 
 # RUN --mount=type=bind,source=./wheelhouse,target=/wheelhouse \
 #     --mount=type=cache,target=/root/.cache/uv \
