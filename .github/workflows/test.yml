@@ -16,16 +16,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          path: main
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
           repository: triton-lang/triton
           ref: v3.3.1
-          path: triton
       - name: Patch setup
         run: |
-          cp -r main/triton/patches/python/* triton/python/
+          echo "[build_ext]" >> python/setup.cfg
+          echo "base-dir=/project" >> python/setup.cfg
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.2.0
         env:
@@ -33,7 +29,7 @@ jobs:
           CIBW_BUILD: "cp312-manylinux_aarch64"
           CIBW_ENVIRONMENT: "MAX_JOBS=4 TRITON_BUILD_WITH_CLANG_LLD=1"
         with:
-          package-dir: triton/python
+          package-dir: python
           output-dir: wheelhouse
       - name: Upload wheels
         uses: actions/upload-artifact@v4
