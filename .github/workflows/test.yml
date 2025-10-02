@@ -28,17 +28,17 @@ jobs:
           python-version: "3.11"
       - name: Patch setup
         run: |
-          cp main/triton/patches/setup.cfg triton/python/setup.cfg
-          cp main/triton/patches/setup.py triton/python/setup.py
+          cp -r main/triton/patches/python/ triton/python/
+          cp -r main/triton/patches/cmake/ triton/cmake/
       - name: Build wheels
+        uses: pypa/cibuildwheel@v3.2.0
         env:
           CIBW_BEFORE_ALL: "dnf install clang lld -y"
           CIBW_BUILD: "cp312-manylinux_aarch64"
           CIBW_ENVIRONMENT: "MAX_JOBS=4 TRITON_BUILD_WITH_CLANG_LLD=1"
-        run: |
-          python --version
-          python3 -m pip install cibuildwheel --user
-          python3 -m cibuildwheel triton/python --output-dir wheelhouse
+        with:
+          package-dir: triton/python
+          output-dir: wheelhouse
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
