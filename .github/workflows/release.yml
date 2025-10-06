@@ -26,7 +26,7 @@ jobs:
           sudo rm -rf /usr/local/lib/android
           echo "Removing dotnet..."
           sudo rm -rf /usr/share/dotnet
-          echo "Removing haskell"
+          echo "Removing haskell..."
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/.ghcup
           echo "Removing tool cache..."
