@@ -1,0 +1,4 @@
+FROM vllm/vllm-openai:v0.10.2
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --system triton==3.2.0

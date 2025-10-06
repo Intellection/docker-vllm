@@ -1,2 +1,3 @@
-# docker-vllm
+# vLLM
+
 OpenAI compatible server for vLLM

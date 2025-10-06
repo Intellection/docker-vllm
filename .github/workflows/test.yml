@@ -1,0 +1,50 @@
+name: test-docker-image
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  IMAGE: zappi/vllm-openai
+  VERSION: 0.10.2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free additional disk space
+        run: |
+          df -h
+          echo "Removing dotnet..."
+          sudo rm -rf /usr/share/dotnet
+          echo "Removing haskell..."
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/.ghcup
+          echo "Removing tool cache..."
+          sudo rm -rf /opt/hostedtoolcache
+          df -h
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Prepare image metadata
+        id: metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=${{ env.VERSION }},prefix=v
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Test building of image
+        uses: docker/build-push-action@v6
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          context: .
+          file: Dockerfile
+          labels: ${{ steps.metadata.outputs.labels }}
+          platforms: linux/amd64
+          push: false
+          tags: ${{ steps.metadata.outputs.tags }}
