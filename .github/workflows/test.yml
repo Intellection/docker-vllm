@@ -7,8 +7,7 @@ on:
 
 env:
   IMAGE: zappi/vllm-openai
-  VLLM_VERSION: 0.10.2
-  TRITON_VERSION: 3.2.0
+  VERSION: 0.10.2
 
 jobs:
   build:
@@ -33,8 +32,7 @@ jobs:
         with:
           images: ${{ env.IMAGE }}
           tags: |
-            type=raw,value=${{ env.VLLM_VERSION }}-triton-${{ env.TRITON_VERSION }}
-            type=raw,value=${{ env.VLLM_VERSION }}
+            type=raw,value=${{ env.VERSION }},prefix=v
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -42,9 +40,6 @@ jobs:
       - name: Test building of image
         uses: docker/build-push-action@v6
         with:
-          build-args: |
-            VLLM_VERSION=${{ env.VLLM_VERSION }}
-            TRITON_VERSION=${{ env.TRITON_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .

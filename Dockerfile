@@ -1,6 +1,4 @@
-ARG VLLM_VERSION
-FROM vllm/vllm-openai:v${VLLM_VERSION}
+FROM vllm/vllm-openai:v0.10.2
 
-ARG TRITON_VERSION
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system triton==${TRITON_VERSION}
+    uv pip install --system triton==3.2.0
