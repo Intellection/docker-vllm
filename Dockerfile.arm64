@@ -1,5 +1,0 @@
-FROM vllm/vllm-openai:v0.10.2
-
-RUN --mount=type=bind,source=./wheelhouse,target=/wheelhouse \
-    --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system /wheelhouse/triton-*.whl
