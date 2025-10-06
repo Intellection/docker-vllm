@@ -45,7 +45,7 @@ jobs:
 
   docker-hub-release-amd64:
     runs-on: ubuntu-latest
-    concurrency: amd64
+    # concurrency: amd64
     steps:
       - name: Free additional disk space
         run: |
@@ -65,10 +65,11 @@ jobs:
       - name: Prepare image metadata
         id: metadata
         uses: docker/metadata-action@v5
-        # with:
-        #   images: ${{ env.IMAGE }}
-        #   tags: |
-        #     type=raw,value=${{ env.VERSION }},prefix=v,suffix=-amd64
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=${{ env.VERSION }},prefix=v,suffix=-amd64
+            type=raw,value=${{ env.VERSION }},prefix=v
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx

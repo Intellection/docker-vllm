@@ -40,7 +40,7 @@ jobs:
 
   build-amd64:
     runs-on: ubuntu-latest
-    concurrency: amd64
+    # concurrency: amd64
     steps:
       - name: Free additional disk space
         run: |
