@@ -22,6 +22,8 @@ jobs:
       - name: Free additional disk space
         run: |
           df -h
+          echo "Removing dotnet..."
+          sudo rm -rf /usr/share/dotnet
           echo "Removing haskell..."
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/.ghcup
