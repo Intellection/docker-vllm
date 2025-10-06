@@ -12,36 +12,36 @@ on:
 
 env:
   IMAGE: zappi/vllm-openai
-  VERSION: 0.10.2
+  VERSION: 0.9.2
 
 jobs:
-  build-triton-wheel-arm64:
-    runs-on: ubuntu-22.04-arm
-    concurrency: arm64
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          repository: triton-lang/triton
-          ref: v3.3.1
-      - name: Patch setup
-        run: |
-          echo "[build_ext]" >> python/setup.cfg
-          echo "base-dir=/project" >> python/setup.cfg
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v3.2.0
-        env:
-          CIBW_BEFORE_ALL: "dnf install clang lld -y"
-          CIBW_BUILD: "cp312-manylinux_aarch64"
-          CIBW_ENVIRONMENT: "MAX_JOBS=4 TRITON_BUILD_WITH_CLANG_LLD=1"
-        with:
-          package-dir: python
-          output-dir: wheelhouse
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: triton-wheels-linux-arm64
-          path: ./wheelhouse/*.whl
+  # build-triton-wheel-arm64:
+  #   runs-on: ubuntu-22.04-arm
+  #   concurrency: arm64
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
+  #       with:
+  #         repository: triton-lang/triton
+  #         ref: v3.3.1
+  #     - name: Patch setup
+  #       run: |
+  #         echo "[build_ext]" >> python/setup.cfg
+  #         echo "base-dir=/project" >> python/setup.cfg
+  #     - name: Build wheels
+  #       uses: pypa/cibuildwheel@v3.2.0
+  #       env:
+  #         CIBW_BEFORE_ALL: "dnf install clang lld -y"
+  #         CIBW_BUILD: "cp312-manylinux_aarch64"
+  #         CIBW_ENVIRONMENT: "MAX_JOBS=4 TRITON_BUILD_WITH_CLANG_LLD=1"
+  #       with:
+  #         package-dir: python
+  #         output-dir: wheelhouse
+  #     - name: Upload wheels
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: triton-wheels-linux-arm64
+  #         path: ./wheelhouse/*.whl
 
   docker-hub-release-amd64:
     runs-on: ubuntu-latest
@@ -65,10 +65,10 @@ jobs:
       - name: Prepare image metadata
         id: metadata
         uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE }}
-          tags: |
-            type=raw,value=${{ env.VERSION }},prefix=v,suffix=-amd64
+        # with:
+        #   images: ${{ env.IMAGE }}
+        #   tags: |
+        #     type=raw,value=${{ env.VERSION }},prefix=v,suffix=-amd64
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -81,6 +81,8 @@ jobs:
       - name: Build, tag, and push image
         uses: docker/build-push-action@v6
         with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
           file: Dockerfile.amd64
           labels: ${{ steps.metadata.outputs.labels }}
@@ -88,85 +90,85 @@ jobs:
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
 
-  docker-hub-release-arm64:
-    runs-on: ubuntu-latest
-    needs: build-triton-wheel-arm64
-    concurrency: arm64
-    steps:
-      - name: Free additional disk space
-        run: |
-          df -h
-          echo "Removing android..."
-          sudo rm -rf /usr/local/lib/android
-          echo "Removing dotnet..."
-          sudo rm -rf /usr/share/dotnet
-          echo "Removing haskell"
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/.ghcup
-          echo "Removing tool cache..."
-          sudo rm -rf /opt/hostedtoolcache
-          df -h
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Download a single artifact
-        uses: actions/download-artifact@v5
-        with:
-          name: triton-wheels-linux-arm64
-          path: ./wheelhouse/
-      - name: Prepare image metadata
-        id: metadata
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE }}
-          tags: |
-            type=raw,value=${{ env.VERSION }},prefix=v,suffix=-arm64
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-      - name: Build, tag, and push image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile.arm64
-          labels: ${{ steps.metadata.outputs.labels }}
-          platforms: linux/arm64
-          push: true
-          tags: ${{ steps.metadata.outputs.tags }}
+  # docker-hub-release-arm64:
+  #   runs-on: ubuntu-latest
+  #   needs: build-triton-wheel-arm64
+  #   concurrency: arm64
+  #   steps:
+  #     - name: Free additional disk space
+  #       run: |
+  #         df -h
+  #         echo "Removing android..."
+  #         sudo rm -rf /usr/local/lib/android
+  #         echo "Removing dotnet..."
+  #         sudo rm -rf /usr/share/dotnet
+  #         echo "Removing haskell"
+  #         sudo rm -rf /opt/ghc
+  #         sudo rm -rf /usr/local/.ghcup
+  #         echo "Removing tool cache..."
+  #         sudo rm -rf /opt/hostedtoolcache
+  #         df -h
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
+  #     - name: Download a single artifact
+  #       uses: actions/download-artifact@v5
+  #       with:
+  #         name: triton-wheels-linux-arm64
+  #         path: ./wheelhouse/
+  #     - name: Prepare image metadata
+  #       id: metadata
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ${{ env.IMAGE }}
+  #         tags: |
+  #           type=raw,value=${{ env.VERSION }},prefix=v,suffix=-arm64
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
+  #         password: ${{ secrets.DOCKER_HUB_TOKEN }}
+  #     - name: Build, tag, and push image
+  #       uses: docker/build-push-action@v6
+  #       with:
+  #         context: .
+  #         file: Dockerfile.arm64
+  #         labels: ${{ steps.metadata.outputs.labels }}
+  #         platforms: linux/arm64
+  #         push: true
+  #         tags: ${{ steps.metadata.outputs.tags }}
 
-  docker-hub-release-manifest:
-    runs-on: ubuntu-latest
-    needs:
-      - docker-hub-release-amd64
-      - docker-hub-release-arm64
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-      - name: Create and push multi-arch manifest
-        run: |
-          # Create multi-arch manifest
-          docker buildx imagetools create \
-            --tag ${{ env.IMAGE }}:v${{ env.VERSION }} \
-            ${{ env.IMAGE }}:v${{ env.VERSION }}-amd64 \
-            ${{ env.IMAGE }}:v${{ env.VERSION }}-arm64
-      # - name: Update description on Docker Hub
-      #   uses: peter-evans/dockerhub-description@v5
-      #   with:
-      #     username: ${{ secrets.DOCKER_HUB_USERNAME }}
-      #     password: ${{ secrets.DOCKER_HUB_TOKEN }}
-      #     repository: ${{ env.IMAGE }}
+  # docker-hub-release-manifest:
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - docker-hub-release-amd64
+  #     - docker-hub-release-arm64
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
+  #         password: ${{ secrets.DOCKER_HUB_TOKEN }}
+  #     - name: Create and push multi-arch manifest
+  #       run: |
+  #         # Create multi-arch manifest
+  #         docker buildx imagetools create \
+  #           --tag ${{ env.IMAGE }}:v${{ env.VERSION }} \
+  #           ${{ env.IMAGE }}:v${{ env.VERSION }}-amd64 \
+  #           ${{ env.IMAGE }}:v${{ env.VERSION }}-arm64
+  #     # - name: Update description on Docker Hub
+  #     #   uses: peter-evans/dockerhub-description@v5
+  #     #   with:
+  #     #     username: ${{ secrets.DOCKER_HUB_USERNAME }}
+  #     #     password: ${{ secrets.DOCKER_HUB_TOKEN }}
+  #     #     repository: ${{ env.IMAGE }}
 
   # github-release:
   #   runs-on: ubuntu-latest
